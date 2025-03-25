@@ -1,6 +1,6 @@
 # Assignment 3 without GUI
 
-**Is Part of the Assignment**
+**This is Part of the Assignment**
 
 ## Overview
 This is a simple distributed chat application that demonstrates socket-based client-server communication. The implementation allows multiple clients to connect to a central server, join different channels, and exchange messages in real-time.
