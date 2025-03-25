@@ -12,7 +12,7 @@ This holds Assignment 3 required files, Server.py and Client.py<br />
 ## Assignment 3 with GUI
 This implementation includes a graphical user interface for both client
 and server.<br />
-**This Is NOT part of the assignment but feel free to test**<br />
+**This Is NOT part of the assignment but feel free to use**<br />
 <code>Server.py</code> - Enhanced server implementation with GUI elements<br />
 <code>Client.py</code> - Client implementation with graphical interface for better user interaction<br />
 
