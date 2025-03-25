@@ -1,1 +1,0 @@
-This version is not still finished and is full of bugs additionally, it is still coded in python
