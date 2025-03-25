@@ -5,14 +5,14 @@ Those that are part are clearly marked with bolded letters below.<br />
 
 ## Assingment 3 without GUI
 This holds Assignment 3 required files, Server.py and Client.py<br />
-**Is Part of the Assignment**
+**This Is Part of the Assignment**<br />
 <code>Server.py</code> - Simple socket server implementation that handles multiple client connections<br />
 <code>Client.py</code> - Client implementation for connecting to the socket server<br />
 
 ## Assignment 3 with GUI
 This implementation includes a graphical user interface for both client
 and server.<br />
-**Is NOT part of the assignment but feel free to test**
+**This Is NOT part of the assignment but feel free to test**<br />
 <code>Server.py</code> - Enhanced server implementation with GUI elements<br />
 <code>Client.py</code> - Client implementation with graphical interface for better user interaction<br />
 
