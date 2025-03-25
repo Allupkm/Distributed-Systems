@@ -23,7 +23,7 @@ These experimental versions are separate from the assignment requirements and re
 **Everything under this is NOT part of the assignment and should not be used for grading**
 
 ### Chat Application
-**Main feature was server side GUI to hold different functionalities, example kick users or delete channels**
+**Main feature was server side GUI to hold different functionalities, example kick users or delete channels**<br />
 A distributed chat system with a two-tier architecture:
 - <code>chat/client/</code> - Client implementation with both CLI (client.py) and GUI (clientgui.py) interfaces
 - <code>chat/server/</code> - Server implementation with both CLI (server.py) and GUI (servergui.py) interfaces
@@ -37,7 +37,7 @@ A distributed chat system with a two-tier architecture:
 - Persistent message storage
 
 ### Legacy Chat Version
-**This was to see how can I implement different things, example more robust encryption**
+**This was to see how can I implement different things, example more robust encryption**<br />
 An earlier implementation with a three-tier architecture:
 - <code>chat version old/</code> - Contains previous architecture with separate client, server, and registry components
 
