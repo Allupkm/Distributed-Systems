@@ -4,26 +4,24 @@ import os
 import time
 
 
-
+# Function to connect to the server
+# Takes the address as a string in the format "host:port"
 def connectToServer(address):
     try:
         if ":" in address:
-            host, port_str = address.split(":", 1)
+            host, portStr = address.split(":", 1)
             try:
-                port = int(port_str)
+                port = int(portStr)
             except ValueError:
-                print(f"Invalid port number: {port_str}")
+                print(f"Invalid port number: {portStr}")
                 return None
         else:
-            host = "127.0.0.1"  # Default ip address
             port = 3000  # Default port
-        
         # Create socket and connect
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientSocket.connect((host, port))
         print(f"Connected to server at {host}:{port}")
         return clientSocket
-        
     except socket.error as e:
         print(f"Error connecting to server: {e}")
         return None
@@ -75,14 +73,14 @@ def listChannelsandClients(clientSocket, message):
         return False
 
 # Function for receiving messages from server
-def receiveMessages(clientSocket, running_event):
+def receiveMessages(clientSocket, runningEvent):
     try:
-        while running_event.is_set():
+        while runningEvent.is_set():
             try:
                 message = clientSocket.recv(1024).decode("utf-8")
                 if not message:
                     print("Connection to server lost")
-                    running_event.clear()
+                    runningEvent.clear()
                     return
                 
                 # For regular messages
@@ -96,7 +94,7 @@ def receiveMessages(clientSocket, running_event):
                         print(message[4:])
                 
                 # For sent message confirmation
-                elif message.startswith("MSG_SENT:"):
+                elif message.startswith("MSGSENT:"):
                     parts = message.split(":", 2)
                     if len(parts) >= 3:
                         timestamp = parts[1]
@@ -118,7 +116,7 @@ def receiveMessages(clientSocket, running_event):
                         print(f"DM: {message[8:]}")
                 
                 # For private messages sent
-                elif message.startswith("PRIVATE_SENT:"):
+                elif message.startswith("PRIVATESENT:"):
                     parts = message.split(":", 3)  # Split into 4 parts
                     if len(parts) >= 4:
                         timestamp = parts[1]
@@ -130,21 +128,21 @@ def receiveMessages(clientSocket, running_event):
                 
                 # For client list
                 elif message.startswith("CLIENTS:"):
-                    clients_list = message[8:]  # Just get everything after CLIENTS:
-                    print(f"Online clients: {clients_list}")
+                    clients = message[8:]  # Just get everything after CLIENTS:
+                    print(f"Online clients: {clients}")
                 
                 # For channel list
                 elif message.startswith("CHANNELS:"):
-                    channels_list = message[9:]  # Just get everything after CHANNELS:
-                    print(f"Available channels: {channels_list}")
+                    channels = message[9:]  # Just get everything after CHANNELS:
+                    print(f"Available channels: {channels}")
                 
                 # For info messages
                 elif message.startswith("INFO:"):
                     parts = message.split(":", 2)
                     if len(parts) >= 3:
                         timestamp = parts[1]
-                        info_message = parts[2]
-                        print(f"[{timestamp}] {info_message}")
+                        infoMsg = parts[2]
+                        print(f"[{timestamp}] {infoMsg}")
                     else:
                         print(message[5:])
                 
@@ -153,44 +151,30 @@ def receiveMessages(clientSocket, running_event):
                     parts = message.split(":", 2)
                     if len(parts) >= 3:
                         timestamp = parts[1]
-                        error_message = parts[2]
-                        print(f"[{timestamp}] Error: {error_message}")
+                        errorMsg = parts[2]
+                        print(f"[{timestamp}] Error: {errorMsg}")
                     else:
                         print(f"Error: {message[6:]}")
                 
                 # For server disconnect
                 elif message.startswith("QUIT"):
                     print("Server disconnected")
-                    running_event.clear()
+                    runningEvent.clear()
                     return
-                
-                # For history messages
-                elif message.startswith("HISTORY:"):
-                    parts = message.split(":", 3)  # Split into 4 parts
-                    if len(parts) >= 4:
-                        timestamp = parts[1]
-                        sender = parts[2]
-                        content = parts[3]
-                        # Display history message with timestamp and sender
-                        print(f"[{timestamp}] {sender} (history): {content}\n")
-                    else:
-                        #Fallback if something goes wrong
-                        print(f"History: {message[8:]}\n")
-                
                 # For any other message type
                 else:
                     print(message)
                     
             except socket.error: # Handle socket error
                 # Only show connection error if we're still supposed to be running
-                if running_event.is_set():
+                if runningEvent.is_set():
                     print("Connection error")
-                running_event.clear()
+                runningEvent.clear()
                 return
                 
     except Exception as e: # Catch any errors and clear the running event
         print(f"Error receiving messages: {e}")
-        running_event.clear()
+        runningEvent.clear()
 
 def helpmenu(): # Display help menu
     print("\nAvailable commands:")
@@ -202,12 +186,11 @@ def helpmenu(): # Display help menu
     print("/help - Show help menu with available commands")
     print("Type your message and press Enter to send to the current channel\n")
 
-def disconnect(clientSocket, running_event):
+def disconnect(clientSocket, runningEvent):
     print("Disconnecting from server...")
     try:
         # Clear the running event to stop receiving messages
-        running_event.clear()
-        # Give the receive thread a moment to notice the event is cleared
+        runningEvent.clear()
         time.sleep(0.1)
         # Only send QUIT if the socket is still valid
         try:
@@ -226,22 +209,22 @@ def disconnect(clientSocket, running_event):
 
 def main():
     # Get server address
-    server_input = input("Enter server address or press enter to use default (127.0.0.1:3000): ")
+    serverInput = input("Enter server address or press enter to use default (127.0.0.1:3000): ")
     
     # Use default if nothing entered
-    if not server_input: 
-        server_address = "127.0.0.1:3000"
+    if serverInput.strip() == "": 
+        serverAddress = "127.0.0.1:3000" # Default address
     else:
-        server_address = server_input
+        serverAddress = serverInput
     
     # Connect to server
-    clientSocket = connectToServer(server_address)
+    clientSocket = connectToServer(serverAddress)
     if not clientSocket:
         return  # Exit if connection failed due to invalid address or other error
     
     nickname = None # Initialize nickname
     while not nickname or len(nickname) < 1:  # Loop until a valid nickname is set
-        nickname = input("Enter your nickname: ").strip() # Get nickname from user
+        nickname = input("Enter your nickname between 2 and 20 long: ").strip() # Get nickname from user
         if nickname:
             try:
                 clientSocket.send(f"NICKNAME:{nickname}".encode("utf-8")) # Send nickname to server
@@ -255,17 +238,17 @@ def main():
                 print(f"Error setting nickname: {e}") 
                 return
     
-    running_event = threading.Event() # Create an event to control the receive thread
-    running_event.set() # Set the event to indicate that the thread should run
+    runningEvent = threading.Event() # Create an event to control the receive thread
+    runningEvent.set() # Set the event to indicate that the thread should run
  
-    receiveThread = threading.Thread(target=receiveMessages, args=(clientSocket, running_event)) # Create a thread for receiving messages
+    receiveThread = threading.Thread(target=receiveMessages, args=(clientSocket, runningEvent)) # Create a thread for receiving messages
     receiveThread.daemon = True # Set the thread as a daemon so it will exit when the main program exits
     receiveThread.start() # Start the receive thread
     
     helpmenu()
     # Main loop for sending messages
     try:
-        while running_event.is_set(): # Loop while the running event is set
+        while runningEvent.is_set(): # Loop while the running event is set
             message = input().strip() # Get message from user
             if not message:
                 continue
@@ -276,13 +259,13 @@ def main():
 
                 if cmd == "JOIN" and len(command) > 1: # Join a channel
                     channel = command[1]
-                    # Clear screen before joining - makes history more readable
+                    # Clear screen before joining the channel
                     clearScreen()
                     joinChannel(clientSocket, channel) # Join the channel
                 elif cmd == "DM" and len(command) > 1: # Send a direct message
-                    dm_parts = command[1].split(" ", 1) # Split into recipient and message
-                    if len(dm_parts) == 2:
-                        sendDirectMessage(clientSocket, dm_parts[0], dm_parts[1]) # Send the direct message
+                    dmParts = command[1].split(" ", 1) # Split into recipient and message
+                    if len(dmParts) == 2:
+                        sendDirectMessage(clientSocket, dmParts[0], dmParts[1]) # Send the direct message
                     else:
                         print("Invalid DM format. Use: /dm <client> <message>") # Print error message if format is invalid
                 elif cmd == "LIST" and len(command) > 1: # List channels or clients
@@ -293,7 +276,7 @@ def main():
                     else:
                         print("Invalid list command. Use: /list channels or /list clients") # Print error message if command is invalid
                 elif cmd == "QUIT": # Disconnect from server
-                    disconnect(clientSocket, running_event)
+                    disconnect(clientSocket, runningEvent)
                 elif cmd == "HELP": # Show help menu
                     helpmenu()
                 else:
@@ -303,9 +286,9 @@ def main():
                 sendMessage(clientSocket, message)
     except Exception as e: # Catch any errors and disconnect from server
         print(f"Error while running client: {e}")
-        running_event.clear()
+        runningEvent.clear()
     finally: # Disconnect from server and close socket in any case to be sure that the socket is closed
-        if running_event.is_set():
-            disconnect(clientSocket, running_event)
+        if runningEvent.is_set():
+            disconnect(clientSocket, runningEvent)
 
 main() # Runs main function
