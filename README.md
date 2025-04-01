@@ -17,6 +17,6 @@ and server.<br />
 <code>Client.py</code> - Client implementation with graphical interface for better user interaction<br />
 
 ## Assignment 3 without extra implementations
-**This is part of the assignment return**
+**This is part of the assignment return** <br />
 This implementations has no extra features, and is the one shown in the video <br />
 This has even simpler implementation of features <br />
