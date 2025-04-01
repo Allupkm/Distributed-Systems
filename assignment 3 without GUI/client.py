@@ -161,6 +161,20 @@ def receiveMessages(clientSocket, runningEvent):
                     print("Server disconnected")
                     runningEvent.clear()
                     return
+                
+                # For history messages
+                elif message.startswith("HISTORY:"):
+                    parts = message.split(":", 3)  # Split into 4 parts
+                    if len(parts) >= 4:
+                        timestamp = parts[1]
+                        sender = parts[2]
+                        content = parts[3]
+                        # Display history message with timestamp and sender
+                        print(f"[{timestamp}] {sender} (history): {content}\n")
+                    else:
+                        #Fallback if something goes wrong
+                        print(f"History: {message[8:]}\n")
+                
                 # For any other message type
                 else:
                     print(message)
@@ -259,7 +273,7 @@ def main():
 
                 if cmd == "JOIN" and len(command) > 1: # Join a channel
                     channel = command[1]
-                    # Clear screen before joining the channel
+                    # Clear screen before joining - makes history more readable
                     clearScreen()
                     joinChannel(clientSocket, channel) # Join the channel
                 elif cmd == "DM" and len(command) > 1: # Send a direct message
