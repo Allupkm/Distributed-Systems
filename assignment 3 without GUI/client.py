@@ -209,20 +209,17 @@ def disconnect(clientSocket, running_event):
         running_event.clear()
         # Give the receive thread a moment to notice the event is cleared
         time.sleep(0.1)
-        
         # Only send QUIT if the socket is still valid
         try:
             clientSocket.send("QUIT".encode("utf-8"))
         except:
-            # Socket may already be closed, that's okay
+            # Socket may already be closed
             pass
-        
         try:
             clientSocket.close()
         except:
-            # Socket may already be closed, that's okay
+            # Socket may already be closed
             pass
-        
         print("Disconnected from server")
     except Exception as e: # Catch any errors during disconnect
         print(f"Error during disconnect: {e}")
