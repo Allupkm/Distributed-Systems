@@ -1,6 +1,6 @@
 # Assignment 3 without extra implementations
 
-**This is NOT Part of the Assignment**
+**This is Part of the Assignment**
 
 ## Overview
 This is a simple distributed chat application that demonstrates socket-based client-server communication. <br />
