@@ -16,6 +16,3 @@ and server.<br />
 <code>Server.py</code> - Enhanced server implementation with GUI elements<br />
 <code>Client.py</code> - Client implementation with graphical interface for better user interaction<br />
 
-## Under development
-This section contains ongoing development work for distributed chat applications that explore different architectural approaches and implementation techniques.<br />
-**This directory is empty**
